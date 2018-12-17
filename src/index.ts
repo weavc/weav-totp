@@ -26,7 +26,6 @@ interface ITOTP {
 
 export var TOTP: ITOTP = {
 
-
     verify(Secret: string, OTP: string) : Promise<string> {
         return new Promise<string> ((resolve, reject) => {
             var K = Base32ToHex(Secret);
@@ -84,7 +83,7 @@ function PadLeft(string: string, length: number, padwith: string) : string {
     return string;
 }
 
-function Base32ToHex(base32: string) : Buffer {
+export function Base32ToHex(base32: string) : Buffer {
     var base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
     var bits = "";
     var hex = "";
@@ -98,20 +97,22 @@ function Base32ToHex(base32: string) : Buffer {
         var chunk = bits.substr(i, 4);
         hex = hex + parseInt(chunk, 2).toString(16);
     }
+    
+    var chunk = PadLeft(bits.substr(i, bits.length), 4, '0');
+    hex = hex + parseInt(chunk, 2).toString(16);
 
     var h = Buffer.from(hex, 'hex');
     return h;
 }
 
-function HexToBase32(bytes: Buffer) : string {
+export function HexToBase32(hex: Buffer) : string {
     var base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
     var base32 = '';
     var bits = 0;
     var value = 0;
-    var view = new Uint8Array(bytes);
 
-    for (var i = 0; i < bytes.byteLength; i++) {
-        value = (value << 8) | view[i]
+    for (var i = 0; i < hex.byteLength; i++) {
+        value = (value << 8) | hex[i]
         bits += 8
 
         while (bits >= 5) {
@@ -120,9 +121,9 @@ function HexToBase32(bytes: Buffer) : string {
         }
     }
 
-    if (bits > 0) {
-        base32 += base32chars[(value << (5 - bits)) & 31]
-    }
+    // if (bits > 0) {
+    //     base32 += base32chars[(value << (5 - bits)) & 31]
+    // }
 
     return base32;
 }
