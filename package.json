@@ -1,0 +1,29 @@
+{
+  "name": "weav-totp",
+  "version": "0.0.1",
+  "description": "Typescript TOTP implementation",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc -p .",
+    "test": "npm run build && tsc -p test/ && node test/test.js"
+  },
+  "author": "Chris Weaver",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChrisWeaver1/weav-totp"
+  },
+  "keywords": [
+    "totp",
+    "2fa",
+    "2 factor",
+    "auth",
+    "authentication"
+  ],
+  "devDependencies": {
+    "@types/node": "^10.12.15",
+    "typescript": "^3.2.2"
+  }
+}
