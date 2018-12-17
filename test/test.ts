@@ -1,23 +1,38 @@
 
-const assert = require('assert');
-import { TOTP } from '../lib/index';
 
-var secret = 'qwewrg3rvr4vqerv4tt5bervewetbe4rQERGERGWERFWEGEewefwefWEWEGEW';
-var id = 'oeriqnjiowefioewiofweoinfioewfnioqwenfionefi3njofn3oqfnoqwnfoqewmf';
-var otp = '123456';
+import { expect, assert } from 'chai';
+import { TOTP, Base32ToHex, HexToBase32 } from '../lib/index';
 
-function test() {
-    TOTP.create(id, secret).then((value) => {
-        assert.equal(value, 'ZZ3XJ6WEH5BEBWGJ44RFOEXUYPPZLZVI');
-        TOTP.verify(value, otp).then((success: string) => {
-            assert.equal(success.length, 6);
-        }, (error: string) => {
-            assert.equal(error.length, 6);
-        })
-    }, (error) => {
-        assert.fail('Could not create secret');
-        console.log(error);
+var secret = 'Srt%43G6fd34GrU52@';
+var id = 'd$%fjJr45:;gR+daa57';
+var value = 'PKHEPF3N4EV3RPGLUQWNKZR6VYD7IZOF';
+
+var buffervalue = Buffer.from([7, 198, 83, 196, 221, 62, 59, 176]);
+var stringvalue = 'A7DFHRG5HY53';
+
+describe('tests', () => {
+    it('creates correct secret', () => {
+        return TOTP.create(id, secret).then((result) => {
+            expect(result).to.equal(value);
+        }, (fail) => {
+            assert.fail();
+        }).catch(()=> { assert.fail(); });
     });
-}
-
-test();
+    it('creates otp', () => {
+        return TOTP.verify(value, 'qwerty').then((result) => {
+            assert.fail();
+        }, (fail) => {
+            console.log(fail);
+            expect(fail.length).to.equal(6);
+            expect(parseInt(fail)).to.not.equal(NaN);
+        }).catch(()=> { assert.fail(); });
+    });
+    it('converts base32 to hex', () => {
+        var result = Base32ToHex(stringvalue);
+        expect(result.toString()).to.equal(buffervalue.toString());
+    });
+    it('converts hex to base32', () => {
+        var result = HexToBase32(buffervalue);
+        expect(result).to.equal(stringvalue);
+    });
+})
