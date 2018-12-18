@@ -1,5 +1,7 @@
 ## weav-totp
 
+[![NPM](https://nodei.co/npm/weav-totp.png)](https://nodei.co/npm/weav-totp/)
+
 ### Description
 
 - Verify 6-digit time-based one time password authentication, as used in applications like google authenticator.
