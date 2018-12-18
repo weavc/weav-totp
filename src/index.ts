@@ -22,6 +22,25 @@ interface ITOTP {
      * Sonething unique and secret to you, should stay constant whenever creating new secrets.
      */
     create(Identifier: string, Secret: string) : Promise<string>;
+    create(Identifier: string, Secret: string, Length: number) : Promise<string>;
+    /**
+     * @description
+     * Returns link to charted QR code using google's chart API.
+     * You can use this inside a img tag on a webpage or something 
+     * @param Secret 
+     * User's unique secret
+     * @param User
+     * Username/Email of user
+     * @param Issuer 
+     * A string identifying your website
+     * @param h 
+     * Height of generated QRCode (px)
+     * @default 200
+     * @param w 
+     * Width of generated QRCode (px)
+     * @default 200
+     */
+    chart(Secret: string, User: string, Issuer: string, h?: number, w?: number) : string;
 }
 
 export var TOTP: ITOTP = {
@@ -49,19 +68,24 @@ export var TOTP: ITOTP = {
 		});
     },
 
-    create(Identifier: string, Secret: string) : Promise<string> {
+    create(Identifier: string, Secret: string, Length: number = 32) : Promise<string> {
         return new Promise<string> ((resolve, reject) => {
             try {
+                if (Length > 32 || Length <= 0) return reject('Length must be between or equal to 1 and 32');
                 var cipher = crypto
                     .createHmac('sha1', Secret)
                     .update(Identifier)
                     .digest('hex');
                 var bytes = Buffer.from(cipher, 'hex');
-                resolve(HexToBase32(bytes));
+                resolve(HexToBase32(bytes).substr(0, Length));
             } catch (err) {
                 reject(err);
             }
         })
+    }, 
+
+    chart(Secret: string, User: string, Issuer: string, h: number = 200, w: number = 200) : string {
+        return `https://chart.googleapis.com/chart?chs=${h}x${w}&chld=M|0&cht=qr&chl=otpauth://totp/${Issuer}:${User}?secret=${Secret}&issuer=${Issuer}`;
     }
 }
 
