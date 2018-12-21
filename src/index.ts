@@ -9,8 +9,11 @@ interface ITOTP {
      * Unique string given to user, used by 2fa services to generate OTP
      * @param OTP
      * 6-digit, one time password provided by user
+     * @param time
+     * Optional time, mostly for testing
      */
     verify(Secret: string, OTP: string): Promise<string>;
+    verify(Secret: string, OTP: string, time: Date): Promise<string>;
     /**
      * @description
      * Create a unique secret per user.
@@ -45,10 +48,16 @@ interface ITOTP {
 
 export const TOTP: ITOTP = {
 
-    verify(Secret: string, OTP: string): Promise<string> {
+    verify(Secret: string, OTP: string, time: Date = null): Promise<string> {
         return new Promise<string> ((resolve, reject) => {
+
+            let Time = (new Date());
+            if (time) {
+                Time = time;
+            }
+
             const K = Base32ToHex(Secret);
-            const T = PadLeft(DecimalToHex(Math.floor((Math.round(((new Date()).getTime() / 1000.0))) / 30)), 16, '0');
+            const T = PadLeft(DecimalToHex(Math.floor((Math.round(((Time).getTime() / 1000.0))) / 30)), 16, '0');
             const totp = crypto
                 .createHmac('sha1', K)
                 .update(T, 'hex')
