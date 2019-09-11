@@ -1,5 +1,4 @@
 name: Node CI
-runs-on: ubuntu-18.04
 on: 
   push:
     branches:
